@@ -50,13 +50,16 @@ app.post("/urls", (req, res) => {
   //generate shortURL for user submitted longURL  
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL
-  res.redirect('/urls');         // Respond with 'Ok' (we will replace this)
+  res.redirect('/urls/' + shortURL);         // Respond with 'Ok' (we will replace this)
 });
 
 
 //shows one specific url in url database
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
+  if (!urlDatabase[shortURL]) {
+    res.redirect('/urls/index')  
+  }
   const templateVars = 
   {
     shortURL,
@@ -65,9 +68,18 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render('urls_show', templateVars);
 });
 
-//random hello page we made during initial set up
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+//redirects to the longURL
+app.get("/u/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  if (!urlDatabase[shortURL]) {
+    res.redirect('/urls/index')  
+  }
+  res.redirect(urlDatabase[shortURL]);
+});
+
+//catch all cases that aren't listed above
+app.get("*", (req, res) => {
+  res.send("404 error - page not found");
 });
 
 
