@@ -1,13 +1,27 @@
 const express = require("express");
 const app = express();
+const bodyParser = require('body-parser');
 const PORT = 8080; // default port 8080
 
 app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({extended: true}));
+
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+const generateRandomString =  function() {
+  let result           = '';
+  const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for (let i = 0; i < 6; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 
 //root homepage
 app.get("/", (req, res) => {
@@ -32,10 +46,13 @@ app.get("/urls/new", (req, res) => {
 
 //posts a new url to url database
 app.post("/urls", (req, res) => {
-  const body = req.body;
-  console.log(body);
-  res.render('urls_index', templateVars);
+  console.log(req.body);// Log the POST request body to the console
+  //generate shortURL for user submitted longURL  
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.longURL
+  res.redirect('/urls');         // Respond with 'Ok' (we will replace this)
 });
+
 
 //shows one specific url in url database
 app.get("/urls/:shortURL", (req, res) => {
