@@ -63,6 +63,15 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect('/urls');         // Respond with 'Ok' (we will replace this)
 });
 
+//updates a longURL from url database
+app.post("/urls/:shortURL", (req, res) => {
+  //generate shortURL for user submitted longURL 
+  const {shortURL, longURL} = req.body;
+  //delete shortURL key from databasw
+  urlDatabase[shortURL] = longURL;
+  res.redirect('/urls');         // Respond with 'Ok' (we will replace this)
+});
+
 
 //shows one specific url in url database
 app.get("/urls/:shortURL", (req, res) => {
