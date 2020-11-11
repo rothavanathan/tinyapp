@@ -28,6 +28,17 @@ const users = {
   }
 };
 
+const isRegisteredEmail = (email, database) => {
+  for (const user in database) {
+    if (database[user].email === email) {
+      console.log('this email is in here already')
+      return true;
+    }
+  }
+  return false;
+} 
+
+
 const generateRandomString =  function() {
   let result           = '';
   const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -61,7 +72,7 @@ app.post("/logout", (req, res) => {
 })
 
 
-//ejs template for showing full url database
+//url index route
 app.get("/urls", (req, res) => {
   console.log(req.cookies)
   const userId = req.cookies.user_id;
@@ -74,7 +85,7 @@ app.get("/urls", (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-//ejs template for showing form for adding new url
+//show new url form
 app.get("/urls/new", (req, res) => {
   const templateVars = 
   { 
@@ -93,7 +104,7 @@ app.post("/urls", (req, res) => {
   res.redirect('/urls/' + shortURL);         // Respond with 'Ok' (we will replace this)
 });
 
-//show user registration form
+//show new user registration form
 app.get("/register", (req, res) => {
   console.log(users)
   const templateVars = 
@@ -108,18 +119,22 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
 
   const {email, password} = req.body
-  const newUserID = generateRandomString();
-  users[newUserID] = {
-    id: newUserID,
-    email,
-    password
-  };
-  console.log(users);
-  res.cookie('user_id', newUserID);
-  res.redirect('/urls/');         // Respond with 'Ok' (we will replace this)
+  if (!email || !password) {
+    return res.sendStatus(404);
+  } else if (isRegisteredEmail(email, users)) {
+    return res.sendStatus(404).send('this email is taken');
+  } else {
+    const newUserID = generateRandomString();
+    users[newUserID] = {
+      id: newUserID,
+      email,
+      password
+    };
+    console.log(users);
+    res.cookie('user_id', newUserID);
+    res.redirect('/urls/');
+  }
 });
-
-
 
 //deletes a url from url database
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -130,6 +145,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[shortURL];
   res.redirect('/urls');         // Respond with 'Ok' (we will replace this)
 });
+
 
 //updates a longURL from url database
 app.post("/urls/:shortURL", (req, res) => {
@@ -145,7 +161,7 @@ app.post("/urls/:shortURL", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   if (!urlDatabase[shortURL]) {
-    res.redirect('/urls/index')  
+    return res.redirect('/urls/index')  
   }
 
   const templateVars = 
