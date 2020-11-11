@@ -31,8 +31,7 @@ const users = {
 const isRegisteredEmail = (email, database) => {
   for (const user in database) {
     if (database[user].email === email) {
-      console.log('this email is in here already')
-      return true;
+      return database[user].id;
     }
   }
   return false;
@@ -60,10 +59,29 @@ app.get("/", (req, res) => {
   res.render('urls_index', templateVars);
 });
 
+//get login form 
+app.get("/login", (req, res) => {
+  const templateVars = 
+    { 
+      user: users[req.cookies["user_id"]], 
+    };
+  res.render('login', templateVars);
+});
+
 //login form NEEDS UPDATING TO INCLUDE PASSWORD
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect('/urls')
+  const {email, password} = req.body;
+  if (!isRegisteredEmail(email, users)) {
+    return res.sendStatus(403);
+  } else {
+    const user = isRegisteredEmail(email, users)
+    if (users[user].password !== password) {
+      return res.sendStatus(403);
+    } else {
+      res.cookie("user_id", users[user].id);
+      res.redirect('/urls');
+    }
+  }
 })
 
 app.post("/logout", (req, res) => {
@@ -89,7 +107,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = 
   { 
-    user: users[req.cookies("user_id")],
+    user: users[req.cookies["user_id"]],
     urls: urlDatabase 
   };
   res.render("urls_new", templateVars);
@@ -163,12 +181,11 @@ app.get("/urls/:shortURL", (req, res) => {
   if (!urlDatabase[shortURL]) {
     return res.redirect('/urls/index')  
   }
-
   const templateVars = 
   {
     shortURL,
     longURL: urlDatabase[shortURL],
-    user: users[req.cookies("user_id")]
+    user: users[req.cookies["user_id"]]
   };
   res.render('urls_show', templateVars);
 });
