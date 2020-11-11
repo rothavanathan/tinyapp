@@ -27,7 +27,12 @@ const generateRandomString =  function() {
 
 //root homepage
 app.get("/", (req, res) => {
-  res.send("WELCOME TO THE FASTASMIC URL SHORT'NER PAGE!!!");
+  const templateVars = 
+    { 
+      username: req.cookies["username"],
+      urls: urlDatabase 
+    };
+  res.render('urls_index', templateVars);
 });
 
 app.post("/login", (req, res) => {
@@ -42,13 +47,22 @@ app.get("/urls.json", (req, res) => {
 
 //ejs template for showing full url database
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = 
+    { 
+      username: req.cookies["username"],
+      urls: urlDatabase 
+    };
   res.render('urls_index', templateVars);
 });
 
 //ejs template for showing form for adding new url
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = 
+    { 
+      username: req.cookies["username"],
+      urls: urlDatabase 
+    };
+  res.render("urls_new", templateVars);
 });
 
 //posts a new url to url database
@@ -90,6 +104,7 @@ app.get("/urls/:shortURL", (req, res) => {
   {
     shortURL,
     longURL: urlDatabase[shortURL],
+    username: req.cookies["username"]
   };
   res.render('urls_show', templateVars);
 });
