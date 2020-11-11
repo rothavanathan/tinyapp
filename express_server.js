@@ -25,8 +25,7 @@ const users = {
     email: "user2@example.com", 
     password: "dishwasher-funk"
   }
-}
-
+};
 
 const generateRandomString =  function() {
   let result           = '';
@@ -100,12 +99,19 @@ app.get("/register", (req, res) => {
 });
 
 //registers a new user to database
-app.post("/urls", (req, res) => {
+app.post("/register", (req, res) => {
   console.log(req.body);// Log the POST request body to the console
   //generate shortURL for user submitted longURL  
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL
-  res.redirect('/urls/' + shortURL);         // Respond with 'Ok' (we will replace this)
+  const {email, password} = req.body
+  const newUserID = generateRandomString();
+  users[newUserID] = {
+    id: newUserID,
+    email,
+    password
+  };
+  console.log(users)
+  res.cookie('user_id', newUserID);
+  res.redirect('/urls/');         // Respond with 'Ok' (we will replace this)
 });
 
 
