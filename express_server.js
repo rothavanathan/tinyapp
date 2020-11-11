@@ -14,6 +14,20 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
+
 const generateRandomString =  function() {
   let result           = '';
   const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -45,28 +59,24 @@ app.post("/logout", (req, res) => {
   res.redirect('/urls')
 })
 
-//original json output of url database
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
 
 //ejs template for showing full url database
 app.get("/urls", (req, res) => {
   const templateVars = 
-    { 
-      username: req.cookies["username"],
-      urls: urlDatabase 
-    };
+  { 
+    username: req.cookies["username"],
+    urls: urlDatabase 
+  };
   res.render('urls_index', templateVars);
 });
 
 //ejs template for showing form for adding new url
 app.get("/urls/new", (req, res) => {
   const templateVars = 
-    { 
-      username: req.cookies["username"],
-      urls: urlDatabase 
-    };
+  { 
+    username: req.cookies["username"],
+    urls: urlDatabase 
+  };
   res.render("urls_new", templateVars);
 });
 
@@ -78,6 +88,27 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = req.body.longURL
   res.redirect('/urls/' + shortURL);         // Respond with 'Ok' (we will replace this)
 });
+
+//show user registration form
+app.get("/register", (req, res) => {
+  const templateVars = 
+  { 
+    username: req.cookies["username"],
+    urls: urlDatabase 
+  };
+  res.render("user_register", templateVars);
+});
+
+//registers a new user to database
+app.post("/urls", (req, res) => {
+  console.log(req.body);// Log the POST request body to the console
+  //generate shortURL for user submitted longURL  
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.longURL
+  res.redirect('/urls/' + shortURL);         // Respond with 'Ok' (we will replace this)
+});
+
+
 
 //deletes a url from url database
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -121,6 +152,11 @@ app.get("/u/:shortURL", (req, res) => {
     res.redirect('/urls/index')  
   }
   res.redirect(urlDatabase[shortURL]);
+});
+
+//original json output of url database
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
 });
 
 //catch all cases that aren't listed above
