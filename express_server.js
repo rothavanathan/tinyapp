@@ -40,6 +40,11 @@ app.post("/login", (req, res) => {
   res.redirect('/urls')
 })
 
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect('/urls')
+})
+
 //original json output of url database
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
