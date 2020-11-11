@@ -6,6 +6,7 @@ const PORT = 8080; // default port 8080
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser())
 
 
 const urlDatabase = {
@@ -28,6 +29,11 @@ const generateRandomString =  function() {
 app.get("/", (req, res) => {
   res.send("WELCOME TO THE FASTASMIC URL SHORT'NER PAGE!!!");
 });
+
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body.username);
+  res.redirect('/urls')
+})
 
 //original json output of url database
 app.get("/urls.json", (req, res) => {
