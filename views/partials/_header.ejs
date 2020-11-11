@@ -15,14 +15,15 @@
       <input type="text" name="username" placeholder="username" label="username">
     </form>
   <% } else { %>
-    <div class="collapse navbar-collapse">
-      <div class="navbar-nav nav-item nav-link">
-        <p><%= username %> </p>
-        <form action="/logout" method="POST">
-          <button type="submit">Logout</button>
-        </form>
-      </div>
-    </div> 
+    <div class="navbar-nav">
+      <p class="navbar-text"><%= username %></p>
+    </div>
+    <div class="navbar-nav">
+      <form action="/logout" method="POST">
+        <button type="submit" class="btn btn-outline-dark">Logout</button>
+      </form>
+    </div>
+
   <% } %> 
   </nav>
 </header>
