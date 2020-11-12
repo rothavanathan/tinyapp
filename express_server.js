@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 const PORT = 8080; // default port 8080
 
 app.set('view engine', 'ejs');
@@ -22,12 +23,12 @@ const users = {
   "aJ48lW": {
     id: "aJ48lW", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
  "user2RandomID": {
     id: "user2RandomID", 
     email: "user2@example.com", 
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", 10)
   }
 };
 
@@ -88,7 +89,7 @@ app.post("/login", (req, res) => {
   if (!user) {
     return res.sendStatus(403);
   }     
-  if (users[user].password !== password) {
+  if (!bcrypt.compareSync(password, users[user].password)) {
     return res.sendStatus(403);
   } 
   res.cookie("user_id", users[user].id);
@@ -148,6 +149,7 @@ app.get("/register", (req, res) => {
 //registers a new user to database
 app.post("/register", (req, res) => {
   const {email, password} = req.body
+  const hashedPassword = bcrypt.hashSync(password, 10);
   if (!email || !password) {
     return res.sendStatus(404);
   } 
@@ -156,8 +158,8 @@ app.post("/register", (req, res) => {
   } 
   const newUserID = generateRandomString();
   users[newUserID] = {
-    password,
     email,
+    password: hashedPassword,
     id: newUserID
   };
   res.cookie('user_id', newUserID);
