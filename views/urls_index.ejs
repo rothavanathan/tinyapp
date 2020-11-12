@@ -32,6 +32,11 @@
               <td><form method="POST" action="/urls/<%= url %>/delete"><button type="submit" name="shortURL" value="<%= url%>" class="btn btn-outline-danger">Delete</button></form></td>
             </tr>
           <% } %>
+        <% } else { %>
+          <tr>
+            <td><p><a href='/login'>Login</a> to see your URLs</p></td>
+          </tr>
+
         <% } %> 
       </tbody>
     </table>

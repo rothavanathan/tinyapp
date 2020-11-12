@@ -168,9 +168,21 @@ app.post("/register", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   //generate shortURL for user submitted longURL 
   const shortURL = req.body.shortURL;
+  console.log(urlDatabase[shortURL]);
+  if (!req.cookies.user_id) {
+    return res.sendStatus(403).send('Log in first please');
+  }
+  //cookie id and url id must match in order to delete
+  if (req.cookies.user_id !== urlDatabase[shortURL].userID) {
+    console.log('client wasn\'t permitted to delete');
+    return res.sendStatus(403).send('This is not your URL to delete!');
+  }
   //delete shortURL key from databasw
+  console.log(`deleting ${shortURL} from database\n`)
   delete urlDatabase[shortURL];
-  res.redirect('/urls');         // Respond with 'Ok' (we will replace this)
+  console.log(urlDatabase);
+
+  res.redirect('/urls');
 });
 
 
