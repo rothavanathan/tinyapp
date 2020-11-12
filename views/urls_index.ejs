@@ -24,9 +24,14 @@
       </thead>
       <tbody>
         <% if (user) { %>
+          <% if (Object.keys(urls).length === 0) { %>
+            <tr>
+              <td><p>You have no URLs so far. <a href='/urls/new'>Go make some!</a> </p></td>
+            </tr>
+          <% } %> 
           <% for (let url in urls) { %>
             <tr>
-              <td><%= url %></td>
+              <td><a href="/u/<%= url %>"><%= url %></a></td>
               <td><%= urls[url].longURL %></td>
               <td><a href="/urls/<%= url %>"><button type="submit" name="Edit" class="btn btn-outline-warning">Edit</button></a></td>
               <td><form method="POST" action="/urls/<%= url %>/delete"><button type="submit" name="shortURL" value="<%= url%>" class="btn btn-outline-danger">Delete</button></form></td>
