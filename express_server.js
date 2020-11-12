@@ -98,6 +98,11 @@ app.get("/urls", (req, res) => {
 
 //show new url form
 app.get("/urls/new", (req, res) => {
+  //check if user is logged in
+  if (!req.cookies.user_id) {
+    console.log('no user id');
+    return res.redirect('/login');
+  }
   const templateVars = { 
     user: users[req.cookies["user_id"]],
     urls: urlDatabase 
