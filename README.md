@@ -4,7 +4,7 @@
 
 ## Final Product
 
-![]('TinyApp_giphy1.gif')
+![]('./TinyApp_giphy1.gif')
 
 ## Dependencies
 
