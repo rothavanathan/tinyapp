@@ -11,13 +11,16 @@ app.use(cookieParser())
 
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  b6UTxP: { longURL: "https://www.tinyemperor.ca", userID: "aJ48lW" },
+  b6UTxS: { longURL: "https://www.bleacherreport.com", userID: "user2RandomID" },
+  b6UTxT: { longURL: "https://www.wintersleep.ca", userID: "user2RandomID" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "user2RandomID" }
 };
 
 const users = { 
-  "userRandomID": {
-    id: "userRandomID", 
+  "aJ48lW": {
+    id: "aJ48lW", 
     email: "user@example.com", 
     password: "purple-monkey-dinosaur"
   },
@@ -27,6 +30,18 @@ const users = {
     password: "dishwasher-funk"
   }
 };
+
+const urlsForUser = (id) => {
+  const validURLs = {};
+  //takes in current user id
+  for (const url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      validURLs[url] = urlDatabase[url]
+    }
+  }
+  return validURLs;
+  //returns url entries where url id matches user id
+}
 
 const isRegisteredEmail = (email, database) => {
   for (const user in database) {
@@ -66,7 +81,7 @@ app.get("/login", (req, res) => {
   res.render('login', templateVars);
 });
 
-//login form NEEDS UPDATING TO INCLUDE PASSWORD
+//login form
 app.post("/login", (req, res) => {
   const {email, password} = req.body;
   const user = isRegisteredEmail(email, users)
@@ -89,9 +104,10 @@ app.post("/logout", (req, res) => {
 //url index route
 app.get("/urls", (req, res) => {
   const userId = req.cookies.user_id;
+  const validURLs = urlsForUser(userId);
   const templateVars = { 
     user: users[userId],
-    urls: urlDatabase 
+    urls: validURLs 
   };
   res.render('urls_index', templateVars);
 });
@@ -113,7 +129,10 @@ app.get("/urls/new", (req, res) => {
 //posts a new url to url database
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL, 
+    userID: req.cookies.user_id
+  }
   res.redirect('/urls/' + shortURL);
 });
 
@@ -137,9 +156,9 @@ app.post("/register", (req, res) => {
   } 
   const newUserID = generateRandomString();
   users[newUserID] = {
-    id: newUserID,
+    password,
     email,
-    password
+    id: newUserID
   };
   res.cookie('user_id', newUserID);
   res.redirect('/urls');
@@ -168,13 +187,15 @@ app.post("/urls/:shortURL", (req, res) => {
 //shows one specific url in url database
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
+  const validURLs = urlsForUser(req.cookies.user_id);
   if (!urlDatabase[shortURL]) {
     return res.redirect('/urls/index')  
   }
   const templateVars = {
     shortURL,
-    longURL: urlDatabase[shortURL],
-    user: users[req.cookies["user_id"]]
+    validURLs,
+    longURL: urlDatabase[shortURL].longURL,
+    user: users[req.cookies.user_id]
   };
   res.render('urls_show', templateVars);
 });
@@ -185,7 +206,7 @@ app.get("/u/:shortURL", (req, res) => {
   if (!urlDatabase[shortURL]) {
     res.redirect('/urls/index')  
   }
-  res.redirect(urlDatabase[shortURL]);
+  res.redirect(urlDatabase[shortURL].longURL);
 });
 
 //original json output of url database
