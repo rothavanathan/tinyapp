@@ -5,6 +5,8 @@ const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const PORT = 8080; // default port 8080
 
+const {generateRandomString, urlsForUser, isRegisteredEmail, getUserByEmail} = require('./helpers.js');
+
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
@@ -36,48 +38,6 @@ const users = {
   }
 };
 
-const urlsForUser = (id) => {
-  const validURLs = {};
-  //takes in current user id
-  for (const url in urlDatabase) {
-    if (urlDatabase[url].userID === id) {
-      validURLs[url] = urlDatabase[url]
-    }
-  }
-  return validURLs;
-  //returns url entries where url id matches user id
-}
-
-const isRegisteredEmail = (email, database) => {
-  for (const user in database) {
-    if (database[user].email === email) {
-      return true;
-    }
-  }
-  return false;
-};
-
-const getUserByEmail = function(email, database) {
-  // lookup magic...
-  for (const user in database) {
-    if (database[user].email === email) {
-      return database[user].id;
-    }
-  }
-  return false;
-};
-
-
-
-const generateRandomString =  function() {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  for (let i = 0; i < 6; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-};
 
 
 //root homepage
@@ -120,7 +80,7 @@ app.post("/logout", (req, res) => {
 //url index route
 app.get("/urls", (req, res) => {
   const userId = req.session.user_id;
-  const validURLs = urlsForUser(userId);
+  const validURLs = urlsForUser(userId, urlDatabase);
   const templateVars = { 
     user: users[userId],
     urls: validURLs 
@@ -216,7 +176,7 @@ app.post("/urls/:shortURL", (req, res) => {
 //shows one specific url in url database
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const validURLs = urlsForUser(req.session.user_id);
+  const validURLs = urlsForUser(req.session.user_id, urlDatabase);
   if (!urlDatabase[shortURL]) {
     return res.redirect('/urls/index')  
   }
