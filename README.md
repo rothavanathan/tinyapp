@@ -4,7 +4,7 @@
 
 ## Final Product
 
-!["screenshot description"](#)
+!['./TinyApp_giphy1.gif'](#)
 !["screenshot description"](#)
 
 ## Dependencies
