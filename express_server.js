@@ -51,11 +51,22 @@ const urlsForUser = (id) => {
 const isRegisteredEmail = (email, database) => {
   for (const user in database) {
     if (database[user].email === email) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const getUserByEmail = function(email, database) {
+  // lookup magic...
+  for (const user in database) {
+    if (database[user].email === email) {
       return database[user].id;
     }
   }
   return false;
-} 
+};
+
 
 
 const generateRandomString =  function() {
@@ -89,12 +100,12 @@ app.get("/login", (req, res) => {
 //login form
 app.post("/login", (req, res) => {
   const {email, password} = req.body;
-  const user = isRegisteredEmail(email, users)
-  if (!user) {
-    return res.sendStatus(403);
+  const user = getUserByEmail(email, users)
+  if (!isRegisteredEmail(email, users)) {
+    return res.status(403).send("Whoops! Try again");
   }     
   if (!bcrypt.compareSync(password, users[user].password)) {
-    return res.sendStatus(403);
+    return res.status(403).send("Whoops! Try again");
   } 
   req.session.user_id = users[user].id;
   res.redirect('/urls');
@@ -155,10 +166,10 @@ app.post("/register", (req, res) => {
   const {email, password} = req.body
   const hashedPassword = bcrypt.hashSync(password, 10);
   if (!email || !password) {
-    return res.sendStatus(404);
+    return res.status(403).send('ERROR: 403\nWhoops. I think you missed an input back there.');
   } 
   if (isRegisteredEmail(email, users)) {
-    return res.sendStatus(404).send('this email is taken');
+    return res.status(403).send('ERROR: 403\nthis email is taken');
   } 
   const newUserID = generateRandomString();
   users[newUserID] = {
@@ -176,12 +187,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.body.shortURL;
   console.log(urlDatabase[shortURL]);
   if (!req.session.user_id) {
-    return res.sendStatus(403).send('Log in first please');
+    return res.status(403).send('Log in first, please.');
   }
   //cookie id and url id must match in order to delete
   if (req.session.user_id !== urlDatabase[shortURL].userID) {
     console.log('client wasn\'t permitted to delete');
-    return res.sendStatus(403).send('This is not your URL to delete!');
+    return res.status(403).send('This is not your URL to delete!');
   }
   //delete shortURL key from databasw
   console.log(`deleting ${shortURL} from database\n`)
