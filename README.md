@@ -4,7 +4,7 @@
 
 ## Final Product
 
-![app demo](./TinyApp_giphy.gif)
+![app demo](./TinyApp_giphy1.gif)
 
 ## Dependencies
 
