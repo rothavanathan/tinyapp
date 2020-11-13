@@ -66,12 +66,12 @@ app.post("/login", (req, res) => {
   if (!isRegisteredEmail(email, users)) {
     return res.status(403).send("Whoops! Try again");
   }
+  const user = getUserByEmail(email, users);
   //check if email exists but password is wrong
   if (!bcrypt.compareSync(password, users[user].password)) {
     return res.status(403).send("Whoops! Try again");
   }
   //valid login
-  const user = getUserByEmail(email, users);
   req.session.userId = users[user].id;
   res.redirect('/urls');
 });
@@ -158,9 +158,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   if (!req.session.userId) {
     return res.status(403).send('Log in first, please.\n');
   }
+  //if specific url doens't exist
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send(`There's no URL with that name around here.`);
+  }
   //if cookie id and url id must match in order to delete
   if (req.session.userId !== urlDatabase[shortURL].userID) {
-    console.log('client wasn\'t permitted to delete');
     return res.status(403).send('This is not your URL to delete!');
   }
   //delete shortURL key from databasw
