@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
+const methodOverride = require('method-override');
 const bcrypt = require('bcrypt');
 const PORT = 8080; // default port 8080
 
@@ -10,6 +11,7 @@ const {generateRandomString, urlsForUser, isRegisteredEmail, getUserByEmail} = r
 
 //app config
 app.set('view engine', 'ejs');
+app.use(methodOverride('X-HTTP-Method-Override'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
