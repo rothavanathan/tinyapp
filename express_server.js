@@ -40,7 +40,33 @@ const users = {
   }
 };
 
-
+const visits = {
+  b6UTxQ: {
+    totalVisits: 0,
+    uniqueVisitor: {},
+    timeStamps: []
+  },
+  b6UTxP: {
+    totalVisits: 0,
+    uniqueVisitor: {},
+    timeStamps: []
+  },
+  b6UTxS: {
+    totalVisits: 0,
+    uniqueVisitor: {},
+    timeStamps: []
+  },
+  b6UTxT: {
+    totalVisits: 0,
+    uniqueVisitor: {},
+    timeStamps: []
+  },
+  i3BoGr: {
+    totalVisits: 0,
+    uniqueVisitor: {},
+    timeStamps: []
+  }
+}
 
 //root homepage
 app.get("/", (req, res) => {
@@ -115,6 +141,11 @@ app.post("/urls", (req, res) => {
     longURL: req.body.longURL,
     userID: req.session.userId
   };
+  visits[shortURL] = {
+    totalVisits: 0,
+    uniqueVisitor: {},
+    timeStamps: []
+  },
   res.redirect('/urls/' + shortURL);
 });
 
@@ -170,6 +201,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   }
   //delete shortURL key from databasw
   delete urlDatabase[shortURL];
+  delete visits[shortURL];
   res.redirect('/urls');
 });
 
@@ -205,9 +237,27 @@ app.get("/urls/:shortURL", (req, res) => {
 //redirects to the longURL
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
+  const timeStamp = new Date().getTime();
+  //check if visitor is a repeat or unique by checking cookies
+  if (!req.session.visitor_id) {
+    const visitorID = generateRandomString();
+    req.session.visitor_id = visitorID;
+  }
+  // if cookie exists chheck if they've visited this shortURL before
+  if (!visits[shortURL].uniqueVisitor[req.session.visitor_id]) {
+    visits[shortURL].uniqueVisitor[req.session.visitor_id] = true;
+  }
+  
+  //increment total number of visits
+  visits[shortURL].totalVisits++;
+  //add timestamp to timestamp array
+  visits[shortURL].timeStamps.push(timeStamp);
+
+
   if (!urlDatabase[shortURL]) {
     return res.redirect('/urls/index');
   }
+  console.log(visits)
   res.redirect(urlDatabase[shortURL].longURL);
 });
 
