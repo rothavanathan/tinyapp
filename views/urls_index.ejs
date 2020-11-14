@@ -17,6 +17,9 @@
         <tr>
           <th scope="col">Short URL</th>
           <th scope="col">Long URL</th>
+          <th scope="col">Date created</th>
+          <th scope="col">Total Visits</th>
+          <th scope="col">Unique Visitors</th>
           <th scope="col">Edit</th>
           <th scope="col">Delete</th>
           
@@ -33,6 +36,11 @@
             <tr>
               <td><a href="/u/<%= url %>"><%= url %></a></td>
               <td><%= urls[url].longURL %></td>
+              <td><% const time = new Date(urls[url].dateCreated) %>
+                  <%= time.toString() %> 
+              </td>
+              <td><%= visits[url].totalVisits %></td>
+              <td><%= Object.keys(visits[url].uniqueVisitor).length %></td>
               <td><a href="/urls/<%= url %>"><button type="submit" name="Edit" class="btn btn-outline-warning">Edit</button></a></td>
               <td><form method="POST" action="/urls/<%= url %>/delete?_method=DELETE"><button type="submit" name="shortURL" value="<%= url%>" class="btn btn-outline-danger">Delete</button></form></td>
             </tr>

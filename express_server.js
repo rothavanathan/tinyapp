@@ -18,13 +18,34 @@ app.use(cookieSession({
   keys: ['key1', 'key2']
 }));
 
+const firstDateCreated = new Date().setTime(1605370373766);
+
 //hard code databases
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  b6UTxP: { longURL: "https://www.gearslutz.com", userID: "aJ48lW" },
-  b6UTxS: { longURL: "https://www.bleacherreport.com", userID: "user2RandomID" },
-  b6UTxT: { longURL: "https://www.heyrosetta.com", userID: "user2RandomID" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "user2RandomID" }
+  b6UTxQ: { 
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+    dateCreated: firstDateCreated},
+  b6UTxP: {
+    longURL: "https://www.gearslutz.com",
+    userID: "aJ48lW",
+    dateCreated: firstDateCreated
+  },
+  b6UTxS: {
+    longURL: "https://www.bleacherreport.com",
+    userID: "user2RandomID",
+    dateCreated: firstDateCreated
+  },
+  b6UTxT: {
+    longURL: "https://www.heyrosetta.com",
+    userID: "user2RandomID",
+    dateCreated: firstDateCreated
+  },
+  i3BoGr: { 
+    longURL: "https://www.google.ca",
+    userID: "user2RandomID",
+    dateCreated: firstDateCreated
+  }
 };
 
 const users = {
@@ -114,6 +135,7 @@ app.get("/urls", (req, res) => {
   const userId = req.session.userId;
   const validURLs = urlsForUser(userId, urlDatabase);
   const templateVars = {
+    visits,
     user: users[userId],
     urls: validURLs
   };
@@ -138,6 +160,7 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = {
+    dateCreated: new Date().getTime(),
     longURL: req.body.longURL,
     userID: req.session.userId
   };
@@ -209,9 +232,21 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //updates a longURL from url database
 app.post("/urls/:shortURL", (req, res) => {
   const {shortURL, longURL} = req.body;
+  if (!req.session.userId) {
+    return res.status(403).send('Log in first, please.\n');
+  }
+  //if specific url doens't exist
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send(`There's no URL with that name around here.`);
+  }
+  //if cookie id and url id must match in order to delete
+  if (req.session.userId !== urlDatabase[shortURL].userID) {
+    return res.status(403).send('This is not your URL to delete!');
+  }
   urlDatabase[shortURL] = {
     longURL,
-    userID: req.session.userId
+    userID: req.session.userId,
+    dateCreated: urlDatabase[shortURL].dateCreated
   };
   res.redirect('/urls');
 });
@@ -228,7 +263,8 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL,
     validURLs,
-    longURL: urlDatabase[shortURL].longURL,
+    visits: visits[shortURL],
+    url: urlDatabase[shortURL],
     user: users[req.session.userId]
   };
   res.render('urls_show', templateVars);
@@ -238,6 +274,10 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const timeStamp = new Date().getTime();
+  //make sure shortURL exists in database
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send(`There's no URL with that name around here.`);
+  }
   //check if visitor is a repeat or unique by checking cookies
   if (!req.session.visitor_id) {
     const visitorID = generateRandomString();

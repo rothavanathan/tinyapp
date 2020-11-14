@@ -19,14 +19,19 @@
     <div class="card text-center">
         <div class="card-header"></div>
         <div class="card-body">
-          <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-          <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+          <h5 class="card-title">TinyURL for: <%= url.longURL %></h5>
+          <h5 class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></h5>
+          <p># of visits: <%= visits.totalVisits %> </p>
+          <p># of unique visitors: <%= Object.keys(visits.uniqueVisitor).length %> </p>
+          <p><% const time = new Date(url.dateCreated) %>
+            Date Created: <%= time.toString() %> 
+          </p>
           <hr>
         </div>
       <div class="card-footer text-muted">
         <h5 class="card-title">Edit URL</h5>
         <form method="POST" action="/urls/<%= shortURL %>?_method=PUT">
-          <input type="text" value="<%= longURL %>" name="longURL">
+          <input type="text" value="<%= url.longURL %>" name="longURL">
           <button type="submit" name="shortURL" value="<%= shortURL %>" class="btn btn-outline-warning">Submit</button>
         </form>
       </div>
