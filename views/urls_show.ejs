@@ -21,11 +21,7 @@
         <div class="card-body">
           <h5 class="card-title">TinyURL for: <%= url.longURL %></h5>
           <h5 class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></h5>
-          <p># of visits: <%= visits.totalVisits %> </p>
-          <p># of unique visitors: <%= Object.keys(visits.uniqueVisitor).length %> </p>
-          <p><% const time = new Date(url.dateCreated) %>
-            Date Created: <%= time.toString() %> 
-          </p>
+
           <hr>
         </div>
       <div class="card-footer text-muted">
@@ -34,6 +30,38 @@
           <input type="text" value="<%= url.longURL %>" name="longURL">
           <button type="submit" name="shortURL" value="<%= shortURL %>" class="btn btn-outline-warning">Submit</button>
         </form>
+        <hr>
+      </div>
+      <div class="card-header"></div>
+      <div class="card-body">
+        <h5>Analytics</h5>
+        <p><em># of visits:</em> <%= visits.totalVisits %> </p>
+        <p><em># of unique visitors:</em> <%= Object.keys(visits.uniqueVisitor).length %> </p>
+        <p><% const time = new Date(url.dateCreated) %>
+          <em>URL Date Created:</em> <%= time.toString() %> 
+        </p>
+        <h6>Log of Visits</h6>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Visitor ID</th>
+              <th scope="col">Timestamp</th>            
+            </tr>
+          </thead>
+          <tbody>
+            <% if (visits.visit.length !== 0) { %>
+              <% for (const entry of visits.visit) { %>
+                <tr>
+                  <td><%= entry[1] %></td>
+                  <td><% const time = new Date(entry[0]) %>
+                    <%= time.toString() %> 
+                </td>
+
+                </tr>
+                <% } %> 
+            <% } %>
+          </tbody>
+        <hr>
       </div>
     </div>
   <% } %> 

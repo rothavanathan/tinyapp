@@ -65,27 +65,27 @@ const visits = {
   b6UTxQ: {
     totalVisits: 0,
     uniqueVisitor: {},
-    timeStamps: []
+    visit: []
   },
   b6UTxP: {
     totalVisits: 0,
     uniqueVisitor: {},
-    timeStamps: []
+    visit: []
   },
   b6UTxS: {
     totalVisits: 0,
     uniqueVisitor: {},
-    timeStamps: []
+    visit: []
   },
   b6UTxT: {
     totalVisits: 0,
     uniqueVisitor: {},
-    timeStamps: []
+    visit: []
   },
   i3BoGr: {
     totalVisits: 0,
     uniqueVisitor: {},
-    timeStamps: []
+    visit: []
   }
 }
 
@@ -167,7 +167,7 @@ app.post("/urls", (req, res) => {
   visits[shortURL] = {
     totalVisits: 0,
     uniqueVisitor: {},
-    timeStamps: []
+    visit: []
   },
   res.redirect('/urls/' + shortURL);
 });
@@ -267,6 +267,7 @@ app.get("/urls/:shortURL", (req, res) => {
     url: urlDatabase[shortURL],
     user: users[req.session.userId]
   };
+  console.log(visits[shortURL])
   res.render('urls_show', templateVars);
 });
 
@@ -274,6 +275,7 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const timeStamp = new Date().getTime();
+  
   //make sure shortURL exists in database
   if (!urlDatabase[shortURL]) {
     return res.status(404).send(`There's no URL with that name around here.`);
@@ -287,17 +289,16 @@ app.get("/u/:shortURL", (req, res) => {
   if (!visits[shortURL].uniqueVisitor[req.session.visitor_id]) {
     visits[shortURL].uniqueVisitor[req.session.visitor_id] = true;
   }
-  
+  const visit = [timeStamp, req.session.visitor_id]
   //increment total number of visits
   visits[shortURL].totalVisits++;
   //add timestamp to timestamp array
-  visits[shortURL].timeStamps.push(timeStamp);
+  visits[shortURL].visit.push(visit);
 
 
   if (!urlDatabase[shortURL]) {
     return res.redirect('/urls/index');
   }
-  console.log(visits)
   res.redirect(urlDatabase[shortURL].longURL);
 });
 
