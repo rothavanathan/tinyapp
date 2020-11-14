@@ -22,7 +22,7 @@ const firstDateCreated = new Date().setTime(1605370373766);
 
 //hard code databases
 const urlDatabase = {
-  b6UTxQ: { 
+  b6UTxQ: {
     longURL: "https://www.tsn.ca",
     userID: "aJ48lW",
     dateCreated: firstDateCreated},
@@ -41,7 +41,7 @@ const urlDatabase = {
     userID: "user2RandomID",
     dateCreated: firstDateCreated
   },
-  i3BoGr: { 
+  i3BoGr: {
     longURL: "https://www.google.ca",
     userID: "user2RandomID",
     dateCreated: firstDateCreated
@@ -87,7 +87,7 @@ const visits = {
     uniqueVisitor: {},
     visit: []
   }
-}
+};
 
 //root homepage
 app.get("/", (req, res) => {
@@ -267,7 +267,7 @@ app.get("/urls/:shortURL", (req, res) => {
     url: urlDatabase[shortURL],
     user: users[req.session.userId]
   };
-  console.log(visits[shortURL])
+  console.log(visits[shortURL]);
   res.render('urls_show', templateVars);
 });
 
@@ -281,15 +281,15 @@ app.get("/u/:shortURL", (req, res) => {
     return res.status(404).send(`There's no URL with that name around here.`);
   }
   //check if visitor is a repeat or unique by checking cookies
-  if (!req.session.visitor_id) {
+  if (!req.session.visitorId) {
     const visitorID = generateRandomString();
-    req.session.visitor_id = visitorID;
+    req.session.visitorId = visitorID;
   }
   // if cookie exists chheck if they've visited this shortURL before
-  if (!visits[shortURL].uniqueVisitor[req.session.visitor_id]) {
-    visits[shortURL].uniqueVisitor[req.session.visitor_id] = true;
+  if (!visits[shortURL].uniqueVisitor[req.session.visitorId]) {
+    visits[shortURL].uniqueVisitor[req.session.visitorId] = true;
   }
-  const visit = [timeStamp, req.session.visitor_id]
+  const visit = [timeStamp, req.session.visitorId];
   //increment total number of visits
   visits[shortURL].totalVisits++;
   //add timestamp to timestamp array
